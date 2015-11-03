@@ -3,11 +3,14 @@ package com.example.ashish.foodreduction;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -15,63 +18,49 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+    final Activity activity = this;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+        this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
+        setContentView(R.layout.activity_main);
+        WebView webView = (WebView) findViewById(R.id.webView);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setMax(100);
+        webView.getSettings().setJavaScriptEnabled(true);
 
-        WebView webview = new WebView(this);
-        WebSettings webSettings = webview.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        setContentView(webview);
-        final Activity activity = this;
-//        webview.setWebViewClient(new WebViewClient() {
-////            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-////                Toast.makeText(activity, "Oh no! " + description, Toast.LENGTH_SHORT).show();
-////            }
-//
-//            @Override
-//            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-//                super.onReceivedHttpError(view, request, errorResponse);
-//                Toast.makeText(activity,String.valueOf(errorResponse),Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-        webview.setWebViewClient(new WebViewClient(){
-            ProgressDialog progressDialog;
+        webView.setWebChromeClient(new WebChromeClient(){
             @Override
-            public void onLoadResource(WebView view, String url) {
-                super.onLoadResource(view, url);
-                if(progressDialog==null){
-                    progressDialog = new ProgressDialog(MainActivity.this);
-                    progressDialog.setMessage("Loading");
-                    progressDialog.show();
+            public void onProgressChanged(WebView view, int newProgress) {
+                if(progressBar.getVisibility()==View.GONE){
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setProgress(newProgress);
                 }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                try{
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                        progressDialog=null;
-                    }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
+                if (newProgress == 100){
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        webview.canGoBackOrForward(5);
-        webview.loadUrl("http://foodreduction.tk/");
+        webView.setWebViewClient(new WebViewClient() {
 
 
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
 
+        webView.loadUrl("http://foodreduction.tk");
     }
 
     @Override
