@@ -2,31 +2,25 @@ package com.example.ashish.foodreduction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
+import android.content.DialogInterface;
+
 import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+
 import android.view.Window;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+
 
 public class MainActivity extends Activity {
 
@@ -38,42 +32,62 @@ public class MainActivity extends Activity {
         this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_main);
         WebView webView =  (WebView) findViewById(R.id.webView);
-//        WebView webView = new WebView(this); //(WebView) findViewById(R.id.webView);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setMax(100);
-        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.loadUrl("http://foodreduction.tk");
-        webView.loadUrl("http://facebook.com");
-        webView.canGoBackOrForward(5);
+        if(check_connectivity()==false){
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+            alertDialog.create();
+            alertDialog.setTitle("Oops...");
+            alertDialog.setMessage("No Internet Connectivity. Try Again");
 
-
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                if (progressBar.getVisibility() == View.GONE) {
-                    progressBar.setVisibility(View.VISIBLE);
+            webView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            alertDialog.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    MainActivity.this.finish();
                 }
-                progressBar.setProgress(newProgress);
-                if (newProgress == 100) {
-                    progressBar.setVisibility(View.GONE);
+            });
+            alertDialog.show();
+
+        }
+        else {
+
+
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setMax(100);
+            webView.getSettings().setJavaScriptEnabled(true);
+//             webView.loadUrl("http://foodreduction.tk");
+            webView.loadUrl("http://facebook.com");
+            webView.canGoBackOrForward(5);
+
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    if (progressBar.getVisibility() == View.GONE) {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
+                    progressBar.setProgress(newProgress);
+                    if (newProgress == 100) {
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
-            }
 
-        });
+            });
 
-        webView.setWebViewClient(new WebViewClient() {
+            webView.setWebViewClient(new WebViewClient() {
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
+                @Override
+                public void onPageFinished(WebView view, String url) {
 //                setContentView(R.layout.activity_main);
-            }
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-        });
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    view.loadUrl(url);
+                    return true;
+                }
+            });
+        }
         Log.d("Status", String.valueOf(check_connectivity()));
 //        ImageView imageView = new ImageView(getApplicationContext());
 //        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -115,5 +129,10 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
     }
 }
