@@ -56,8 +56,8 @@ public class MainActivity extends Activity {
             progressBar.setVisibility(View.VISIBLE);
             progressBar.setMax(100);
             webView.getSettings().setJavaScriptEnabled(true);
-//             webView.loadUrl("http://foodreduction.tk");
-            webView.loadUrl("http://facebook.com");
+             webView.loadUrl("http://foodreduction.tk");
+//            webView.loadUrl("http://facebook.com");
             webView.canGoBackOrForward(5);
 
             webView.setWebChromeClient(new WebChromeClient() {
